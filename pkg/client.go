@@ -1,28 +1,45 @@
 package pkg
 
-import "net"
+import (
+	"net"
+	"time"
+)
 
 type Client struct {
-	addr string
+	Addr    string
+	Timeout time.Duration
 }
 
-func NewClient(addr string) *Client {
-	return &Client{addr: addr}
+func NewClient(addr string, timeout time.Duration) *Client {
+	return &Client{
+		Addr:    addr,
+		Timeout: timeout,
+	}
 }
 
 func (c *Client) Ping(b []byte) (string, error) {
-	conn, err := net.Dial("tcp", c.addr)
+	conn, err := net.DialTimeout("tcp", c.Addr, c.Timeout)
 	if err != nil {
 		return "", err
 	}
 	defer conn.Close()
 
+	if c.Timeout > 0 {
+		if err = conn.SetDeadline(time.Now().Add(c.Timeout)); err != nil {
+			return "", err
+		}
+	}
 	_, err = conn.Write(b)
 	if err != nil {
 		return "", err
 	}
 
 	buf := make([]byte, 1024)
+	if c.Timeout > 0 {
+		if err = conn.SetDeadline(time.Now().Add(c.Timeout)); err != nil {
+			return "", err
+		}
+	}
 	n, err := conn.Read(buf)
 	if err != nil {
 		return "", err
