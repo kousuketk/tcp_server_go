@@ -1,9 +1,9 @@
-package client_main
+package main
 
 import (
 	"fmt"
 
-	"github.com/kousukekt/tcp_server_go/pkg"
+	"github.com/kousuketk/tcp_server_go/pkg"
 )
 
 func main() {

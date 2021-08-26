@@ -1,14 +1,17 @@
-package server_main
+package main
 
 import (
 	"io"
 	"log"
 	"net"
+	"os"
 )
 
 func echo_handler(conn net.Conn) {
 	defer conn.Close()
-	io.Copy(conn, conn)
+	w := io.MultiWriter(os.Stdout, conn)
+	io.Copy(w, conn)
+	os.Stdout.Write([]byte("\n"))
 }
 
 func main() {
